@@ -2,27 +2,27 @@ This repository contains the assignments and practical exercises completed as pa
 
 The assignments cover the following topics:
 
-Introduction to Databases
+-> Introduction to Databases
 
-Database Normalization
+-> Database Normalization
 
-Managing Databases, Tables and Collections
+-> Managing Databases, Tables and Collections
 
-DML Statements (INSERT, UPDATE, DELETE)
+-> DML Statements (INSERT, UPDATE, DELETE)
 
-SQL Joins
+-> SQL Joins
 
-Subqueries
+-> Subqueries
 
-Window Functions
+-> Window Functions
 
-Transactions and ACID Properties
+-> Transactions and ACID Properties
 
-Views
+-> Views
 
-Stored Procedures and Stored Functions
+-> Stored Procedures and Stored Functions
 
-Cursors
+-> Cursors
 
 Triggers
 
