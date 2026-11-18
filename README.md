@@ -24,6 +24,6 @@ The assignments cover the following topics:
 
 -> Cursors
 
-Triggers
+-> Triggers
 
 The assignments include practical SQL queries and MongoDB operations based on real-world business scenarios to improve database management and data manipulation skills.
