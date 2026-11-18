@@ -1,0 +1,267 @@
+
+ SET 2 - BANK LOAN PORTFOLIO
+
+
+// Select database
+db = db.getSiblingDB("LoanPortfolioDB");
+
+// Clear previous sample documents so this file can be rerun.
+// WARNING: This deletes documents in these collections.
+db.customers.deleteMany({});
+db.branches.deleteMany({});
+db.loans.deleteMany({});
+db.repayments.deleteMany({});
+
+
+
+// TASK 0 : INSERT SAMPLE DOCUMENTS
+
+
+// CUSTOMERS
+db.customers.insertMany([
+    { customerId: 1, customerName: "Arun", phone: "9000000001", city: "Chennai" },
+    { customerId: 2, customerName: "Bala", phone: "9000000002", city: "Chennai" },
+    { customerId: 3, customerName: "Charan", phone: "9000000003", city: "Bengaluru" },
+    { customerId: 4, customerName: "Divya", phone: "9000000004", city: "Hyderabad" },
+    { customerId: 5, customerName: "Esha", phone: "9000000005", city: "Mumbai" },
+    { customerId: 6, customerName: "Farhan", phone: "9000000006", city: "Chennai" }
+]);
+
+// BRANCHES
+db.branches.insertMany([
+    { branchId: 1, branchName: "Chennai Main Branch", city: "Chennai" },
+    { branchId: 2, branchName: "T Nagar Branch", city: "Chennai" },
+    { branchId: 3, branchName: "Bengaluru Branch", city: "Bengaluru" },
+    { branchId: 4, branchName: "Hyderabad Branch", city: "Hyderabad" },
+    { branchId: 5, branchName: "Mumbai Branch", city: "Mumbai" }
+]);
+
+// LOANS
+// guarantorIds stores the guarantor customer IDs for each loan.
+db.loans.insertMany([
+    {
+        loanId: 101, customerId: 1, branchId: 1,
+        loanAmount: 500000, outstandingBalance: 350000,
+        instalmentsDue: 10, instalmentsPaid: 5,
+        loanDate: new Date(Date.now() - 300 * 86400000),
+        loanStatus: "ACTIVE", guarantorIds: [2]
+    },
+    {
+        loanId: 102, customerId: 2, branchId: 1,
+        loanAmount: 300000, outstandingBalance: 180000,
+        instalmentsDue: 8, instalmentsPaid: 7,
+        loanDate: new Date(Date.now() - 240 * 86400000),
+        loanStatus: "ACTIVE", guarantorIds: [3]
+    },
+    {
+        loanId: 103, customerId: 3, branchId: 2,
+        loanAmount: 800000, outstandingBalance: 620000,
+        instalmentsDue: 12, instalmentsPaid: 6,
+        loanDate: new Date(Date.now() - 400 * 86400000),
+        loanStatus: "ACTIVE", guarantorIds: [1]
+    },
+    {
+        loanId: 104, customerId: 1, branchId: 2,
+        loanAmount: 250000, outstandingBalance: 100000,
+        instalmentsDue: 6, instalmentsPaid: 6,
+        loanDate: new Date(Date.now() - 180 * 86400000),
+        loanStatus: "CLOSED", guarantorIds: [4]
+    },
+    {
+        loanId: 105, customerId: 4, branchId: 3,
+        loanAmount: 900000, outstandingBalance: 700000,
+        instalmentsDue: 15, instalmentsPaid: 9,
+        loanDate: new Date(Date.now() - 500 * 86400000),
+        loanStatus: "ACTIVE", guarantorIds: [2]
+    },
+    {
+        loanId: 106, customerId: 2, branchId: 3,
+        loanAmount: 400000, outstandingBalance: 250000,
+        instalmentsDue: 9, instalmentsPaid: 8,
+        loanDate: new Date(Date.now() - 220 * 86400000),
+        loanStatus: "ACTIVE", guarantorIds: [5]
+    },
+    {
+        loanId: 107, customerId: 5, branchId: 4,
+        loanAmount: 650000, outstandingBalance: 500000,
+        instalmentsDue: 11, instalmentsPaid: 4,
+        loanDate: new Date(Date.now() - 350 * 86400000),
+        loanStatus: "ACTIVE", guarantorIds: [3]
+    },
+    {
+        loanId: 108, customerId: 3, branchId: 4,
+        loanAmount: 200000, outstandingBalance: 80000,
+        instalmentsDue: 5, instalmentsPaid: 5,
+        loanDate: new Date(Date.now() - 150 * 86400000),
+        loanStatus: "CLOSED", guarantorIds: [4]
+    },
+    {
+        loanId: 109, customerId: 1, branchId: 1,
+        loanAmount: 150000, outstandingBalance: 120000,
+        instalmentsDue: 7, instalmentsPaid: 2,
+        loanDate: new Date(Date.now() - 200 * 86400000),
+        loanStatus: "ACTIVE", guarantorIds: [5]
+    }
+]);
+
+// REPAYMENTS
+// Dates are relative to the day the script is executed.
+db.repayments.insertMany([
+    { repaymentId: 1001, loanId: 101, repaymentDate: new Date(Date.now() - 10 * 86400000), amount: 15000, status: "SUCCESS" },
+    { repaymentId: 1002, loanId: 101, repaymentDate: new Date(Date.now() - 40 * 86400000), amount: 15000, status: "SUCCESS" },
+    { repaymentId: 1003, loanId: 102, repaymentDate: new Date(Date.now() - 90 * 86400000), amount: 12000, status: "SUCCESS" },
+    { repaymentId: 1004, loanId: 103, repaymentDate: new Date(Date.now() - 75 * 86400000), amount: 20000, status: "SUCCESS" },
+    { repaymentId: 1005, loanId: 104, repaymentDate: new Date(Date.now() - 15 * 86400000), amount: 10000, status: "SUCCESS" },
+    { repaymentId: 1006, loanId: 105, repaymentDate: new Date(Date.now() - 120 * 86400000), amount: 25000, status: "SUCCESS" },
+    { repaymentId: 1007, loanId: 106, repaymentDate: new Date(Date.now() - 20 * 86400000), amount: 14000, status: "SUCCESS" },
+    { repaymentId: 1008, loanId: 107, repaymentDate: new Date(Date.now() - 100 * 86400000), amount: 18000, status: "SUCCESS" },
+    { repaymentId: 1009, loanId: 108, repaymentDate: new Date(Date.now() - 5 * 86400000), amount: 8000, status: "SUCCESS" }
+]);
+
+
+// ============================================================
+// VERIFY SAMPLE DATA
+// ============================================================
+
+print("\n--- CUSTOMERS ---");
+db.customers.find().forEach(printjson);
+
+print("\n--- BRANCHES ---");
+db.branches.find().forEach(printjson);
+
+print("\n--- LOANS ---");
+db.loans.find().forEach(printjson);
+
+print("\n--- REPAYMENTS ---");
+db.repayments.find().forEach(printjson);
+
+
+// ============================================================
+// TASK 5 : THREE MONGODB AGGREGATION PIPELINES USING $lookup
+// ============================================================
+
+//in - Pipeline 1: Combine loan documents with customer details
+print("\n--- PIPELINE 1: LOANS WITH CUSTOMER DETAILS ---");
+
+db.loans.aggregate([
+    {
+        $lookup: {
+            from: "customers",
+            localField: "customerId",
+            foreignField: "customerId",
+            as: "customer"
+        }
+    },
+    {
+        $unwind: "$customer"
+    },
+    {
+        $project: {
+            _id: 0,
+            loanId: 1,
+            loanAmount: 1,
+            outstandingBalance: 1,
+            loanStatus: 1,
+            customerId: 1,
+            customerName: "$customer.customerName",
+            customerCity: "$customer.city"
+        }
+    },
+    { $sort: { loanId: 1 } }
+]);
+
+
+// ============================================================
+// PIPELINE 2 : LOANS WITH ALL REPAYMENTS
+// ============================================================
+
+//in - Combine loan documents with all repayment records
+print("\n--- PIPELINE 2: LOANS WITH ALL REPAYMENTS ---");
+
+db.loans.aggregate([
+    {
+        $lookup: {
+            from: "repayments",
+            localField: "loanId",
+            foreignField: "loanId",
+            as: "repaymentHistory"
+        }
+    },
+    {
+        $project: {
+            _id: 0,
+            loanId: 1,
+            customerId: 1,
+            loanAmount: 1,
+            repaymentHistory: 1
+        }
+    },
+    { $sort: { loanId: 1 } }
+]);
+
+
+// ============================================================
+// PIPELINE 3 : LOANS WITH CUSTOMER AND LAST REPAYMENT
+// ============================================================
+
+//in - Combine each loan with customer details and its LAST repayment
+//The lookup pipeline sorts repayments newest-first and keeps only one record.
+print("\n--- PIPELINE 3: LOANS WITH CUSTOMER AND LAST REPAYMENT ---");
+
+db.loans.aggregate([
+    {
+        $lookup: {
+            from: "customers",
+            localField: "customerId",
+            foreignField: "customerId",
+            as: "customer"
+        }
+    },
+    {
+        $unwind: {
+            path: "$customer",
+            preserveNullAndEmptyArrays: true
+        }
+    },
+    {
+        $lookup: {
+            from: "repayments",
+            let: { currentLoanId: "$loanId" },
+            pipeline: [
+                {
+                    $match: {
+                        $expr: {
+                            $eq: ["$loanId", "$$currentLoanId"]
+                        }
+                    }
+                },
+                { $sort: { repaymentDate: -1, repaymentId: -1 } },
+                { $limit: 1 }
+            ],
+            as: "lastRepayment"
+        }
+    },
+    {
+        $unwind: {
+            path: "$lastRepayment",
+            preserveNullAndEmptyArrays: true
+        }
+    },
+    {
+        $project: {
+            _id: 0,
+            loanId: 1,
+            customerName: "$customer.customerName",
+            loanAmount: 1,
+            outstandingBalance: 1,
+            lastRepayment: {
+                repaymentId: "$lastRepayment.repaymentId",
+                repaymentDate: "$lastRepayment.repaymentDate",
+                amount: "$lastRepayment.amount",
+                status: "$lastRepayment.status"
+            }
+        }
+    },
+    { $sort: { loanId: 1 } }
+]);
+
