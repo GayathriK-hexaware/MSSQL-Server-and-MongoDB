@@ -1,0 +1,21 @@
+use RetailMongoDB
+
+const quantity = 2
+
+const result = db.products.updateOne(
+    {
+        productId: 101,
+        stockQuantity: { $gte: quantity }
+    },
+    {
+        $inc: { stockQuantity: -quantity }
+    }
+)
+
+if (result.modifiedCount === 1) {
+    print("Stock reserved successfully")
+} else {
+    print("Insufficient stock or product not found")
+}
+
+db.products.findOne({ productId: 101 })
