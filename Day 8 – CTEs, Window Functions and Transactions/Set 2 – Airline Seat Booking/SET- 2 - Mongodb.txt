@@ -1,0 +1,108 @@
+
+use AirlineMongoDB
+
+db.seats.insertMany([
+    {
+        flightId: 301,
+        seatNo: "1A",
+        status: "Available"
+    },
+    {
+        flightId: 301,
+        seatNo: "1B",
+        status: "Available"
+    },
+    {
+        flightId: 301,
+        seatNo: "1C",
+        status: "Booked"
+    }
+])
+
+db.bookings.createIndex(
+    { flightId: 1, seatNo: 1 },
+    { unique: true }
+)
+
+
+//transaction script
+
+
+const session = db.getMongo().startSession();
+
+const airlineDB = session.getDatabase("AirlineMongoDB");
+
+const seats = airlineDB.seats;
+const bookings = airlineDB.bookings;
+
+const flightId = 301;
+const seatNo = "1A";
+const passengerId = 1;
+const passengerName = "Arjun";
+const fare = 7000;
+
+try {
+
+    session.startTransaction({
+        readConcern: { level: "snapshot" },
+        writeConcern: { w: "majority" },
+        readPreference: "primary"
+    });
+
+    const seat = seats.findOne({
+        flightId: flightId,
+        seatNo: seatNo
+    });
+
+    if (!seat) {
+        throw new Error("Seat does not exist");
+    }
+
+    if (seat.status !== "Available") {
+        throw new Error("Seat is already booked");
+    }
+
+    const result = seats.updateOne(
+        {
+            flightId: flightId,
+            seatNo: seatNo,
+            status: "Available"
+        },
+        {
+            $set: { status: "Booked" }
+        }
+    );
+
+    if (result.modifiedCount !== 1) {
+        throw new Error("Seat booking failed");
+    }
+
+    bookings.insertOne({
+        flightId: flightId,
+        seatNo: seatNo,
+        passengerId: passengerId,
+        passengerName: passengerName,
+        fare: fare,
+        bookingDate: new Date()
+    });
+
+    session.commitTransaction();
+
+    print("Booking successful!");
+    print("Seat " + seatNo + " booked for " + passengerName);
+
+} catch (error) {
+
+    try {
+        session.abortTransaction();
+    } catch (abortError) {
+    }
+
+    print("Booking failed: " + error.message);
+    print("All transaction changes rolled back");
+
+} finally {
+
+    session.endSession();
+
+}
